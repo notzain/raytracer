@@ -2,6 +2,7 @@
 #include "PNG.h"
 #include "Ray.h"
 #include <fmt/core.h>
+#include <omp.h>
 
 RGBA colorOf(const Ray& ray)
 {
@@ -33,11 +34,12 @@ int main()
                   .withSize(200, 100)
                   .withFillColor({ 255, 0, 0 });
 
-    Eigen::Vector3f bottomLeft(-2, -1, -1);
-    Eigen::Vector3f horizontal(4, 0, 0);
-    Eigen::Vector3f vertical(0, 2, 0);
-    Eigen::Vector3f origin(0, 0, 0);
+    const Eigen::Vector3f bottomLeft(-2, -1, -1);
+    const Eigen::Vector3f horizontal(4, 0, 0);
+    const Eigen::Vector3f vertical(0, 2, 0);
+    const Eigen::Vector3f origin(0, 0, 0);
 
+#pragma omp parallel for collapse(2)
     for (int y = 0; y < png.height(); ++y) {
         for (int x = 0; x < png.width(); ++x) {
             const float u = x / (float)png.width();
