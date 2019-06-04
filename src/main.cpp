@@ -1,14 +1,20 @@
 #include "Circle.h"
 #include "PNG.h"
 #include "Ray.h"
-#include <ctime>
 #include <fmt/core.h>
 
 RGBA colorOf(const Ray& ray)
 {
     Circle circle(Origin(Eigen::Vector3f { 0, 0, -1 }), .5);
-    if (circle.intersects(ray)) {
-        return { 255, 0, 0 };
+    if (auto hit = circle.intersects(ray)) {
+        const auto hitPos = (ray.pointAlong(hit->distance).value() - Eigen::Vector3f(0, 0, -1))
+                                .normalized();
+        const auto color = .5f * Eigen::Vector3f(hitPos.x() + 1, hitPos.y() + 1, hitPos.z() + 1);
+        return {
+            255 - int(color[0] * 255.f),
+            255 - int(color[1] * 255.f),
+            255 - int(color[2] * 255.f),
+        };
     }
 
     const auto unitDirection = ray.direction().value().normalized();
@@ -41,6 +47,7 @@ int main()
             png.write(x, y, colorOf(ray));
         }
     }
+
     fmt::print("{}", png.save("test.png"));
     return 0;
 }

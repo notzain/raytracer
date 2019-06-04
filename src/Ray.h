@@ -15,6 +15,7 @@ public:
 
     constexpr const Origin& origin() const { return origin_; }
     constexpr const Direction& direction() const { return direction_; }
+    Origin pointAlong(float length) const { return Origin { origin().value() + direction().value() * length }; }
 
 private:
     Origin origin_;

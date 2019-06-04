@@ -3,6 +3,7 @@
 
 #include <Eigen/Dense>
 #include <array>
+#include <optional>
 
 namespace detail {
 struct OriginTag;
@@ -59,7 +60,13 @@ public:
 template <typename T>
 class Intersectable {
 public:
-    bool intersects(const class Ray& ray) const { return static_cast<T const&>(*this).intersects(ray); }
+    struct HitRecord {
+        float distance {};
+        Eigen::Vector3f position {};
+        Eigen::Vector3f normal {};
+    };
+
+    std::optional<HitRecord> intersects(const class Ray& ray) const { return static_cast<T const&>(*this).intersects(ray); }
 };
 
 #endif //RAYTRACER_TYPES_H
