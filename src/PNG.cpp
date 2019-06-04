@@ -12,17 +12,17 @@ PNG::PNG(PNG::Options options)
     std::fill(imageBuffer.begin(), imageBuffer.end(), RGBA {});
 }
 
-PNG::RGBA& PNG::pixel(int x, int y)
+RGBA& PNG::pixel(int x, int y)
 {
     return imageBuffer.at(x + options.width * y);
 }
 
-const PNG::RGBA& PNG::pixel(int x, int y) const
+const RGBA& PNG::pixel(int x, int y) const
 {
     return imageBuffer.at(x + options.width * y);
 }
 
-void PNG::write(int x, int y, const PNG::RGBA& rgba)
+void PNG::write(int x, int y, const RGBA& rgba)
 {
     pixel(x, y) = rgba;
 }
@@ -82,7 +82,7 @@ PNGBuilder& PNGBuilder::withSize(int width, int height)
     return *this;
 }
 
-PNGBuilder& PNGBuilder::withFillColor(const PNG::RGBA& rgba)
+PNGBuilder& PNGBuilder::withFillColor(const RGBA& rgba)
 {
     fillColor = rgba;
     return *this;
