@@ -5,6 +5,7 @@
 #include <string_view>
 #include <vector>
 
+class PNGBuilder;
 class PNG {
     friend class PNGBuilder;
     PNG() = default;
