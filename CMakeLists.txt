@@ -14,7 +14,6 @@ endif()
 include(${CMAKE_BINARY_DIR}/conan.cmake)
 conan_cmake_run(CONANFILE conanfile.txt
         BASIC_SETUP CMAKE_TARGETS
-        BUILD_TYPE "None"
         BUILD missing)
 
 find_package(OpenMP)
