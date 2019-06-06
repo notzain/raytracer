@@ -57,16 +57,19 @@ public:
     constexpr const int& a() const { return rgba[3]; }
 };
 
-template <typename T>
-class Intersectable {
-public:
-    struct HitRecord {
-        float distance {};
-        Eigen::Vector3f position {};
-        Eigen::Vector3f normal {};
-    };
+struct Intersection {
+    float distance {};
+    Eigen::Vector3f position {};
+    Eigen::Vector3f normal {};
+};
 
-    std::optional<HitRecord> intersects(const class Ray& ray) const { return static_cast<T const&>(*this).intersects(ray); }
+struct IIntersectable {
+    virtual std::optional<Intersection> intersects(const class Ray& ray) const = 0;
+};
+
+template <typename T>
+struct Intersectable : public IIntersectable {
+    std::optional<Intersection> intersects(const class Ray& ray) const override { return static_cast<T const&>(*this).intersects(ray); }
 };
 
 #endif //RAYTRACER_TYPES_H

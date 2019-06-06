@@ -2,7 +2,7 @@
 #include "Ray.h"
 #include <cmath>
 
-std::optional<Circle::HitRecord> Circle::intersects(const Ray& ray) const
+std::optional<Intersection> Circle::intersects(const Ray& ray) const
 {
     const auto oc = ray.origin().value() - origin().value();
     const float a = ray.direction().value().dot(ray.direction().value());
@@ -13,7 +13,11 @@ std::optional<Circle::HitRecord> Circle::intersects(const Ray& ray) const
     if (discr < 0)
         return {};
 
-    return HitRecord {
-        -b - std::sqrt(discr) / (2.f * a)
+    const float d = (-b - std::sqrt(discr)) / (2 * a);
+    const auto pointAlong = ray.pointAlong(d).value();
+    return Intersection {
+        d,
+        pointAlong,
+        (pointAlong - origin().value()).normalized()
     };
 }
