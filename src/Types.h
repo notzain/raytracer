@@ -64,12 +64,12 @@ struct Intersection {
 };
 
 struct IIntersectable {
-    virtual std::optional<Intersection> intersects(const class Ray& ray) const = 0;
+    virtual std::optional<Intersection> intersects(const class Ray& ray, float min, float max) const = 0;
 };
 
 template <typename T>
 struct Intersectable : public IIntersectable {
-    std::optional<Intersection> intersects(const class Ray& ray) const override { return static_cast<T const&>(*this).intersects(ray); }
+    std::optional<Intersection> intersects(const class Ray& ray, float min, float max) const override { return static_cast<T const&>(*this).intersects(ray, min, max); }
 };
 
 #endif //RAYTRACER_TYPES_H

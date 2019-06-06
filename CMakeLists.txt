@@ -21,5 +21,5 @@ if (OPENMP_FOUND)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif ()
 
-add_executable(raytracer src/main.cpp src/PNG.cpp src/PNG.h src/Ray.cpp src/Ray.h src/Types.h src/Circle.cpp src/Circle.h)
+add_executable(raytracer src/main.cpp src/PNG.cpp src/PNG.h src/Ray.cpp src/Ray.h src/Types.h src/Circle.cpp src/Circle.h src/Camera.cpp src/Camera.h src/Scene.cpp src/Scene.h)
 target_link_libraries(raytracer CONAN_PKG::fmt CONAN_PKG::libpng CONAN_PKG::eigen)

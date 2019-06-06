@@ -13,7 +13,7 @@ public:
     constexpr const Origin& origin() const { return origin_; }
     constexpr float radius() const { return radius_; }
 
-    std::optional<Intersection> intersects(const class Ray& ray) const;
+    std::optional<Intersection> intersects(const class Ray& ray, float min, float max) const;
 
 private:
     Origin origin_;
