@@ -52,10 +52,22 @@ public:
     {
     }
 
+    static constexpr RGBA fromVec3f(const Vec3f& vec) {
+        return RGBA{
+            int(vec[0] * 255.f),
+            int(vec[1] * 255.f),
+            int(vec[2] * 255.f),
+        };
+    }
+
     constexpr const int& r() const { return rgba[0]; }
     constexpr const int& g() const { return rgba[1]; }
     constexpr const int& b() const { return rgba[2]; }
     constexpr const int& a() const { return rgba[3]; }
+};
+
+struct Material {
+    RGBA diffuse{};
 };
 
 struct Intersection {
@@ -72,5 +84,7 @@ template <typename T>
 struct Intersectable : public IIntersectable {
     std::optional<Intersection> intersects(const class Ray& ray, float min, float max) const override { return static_cast<T const&>(*this).intersects(ray, min, max); }
 };
+
+
 
 #endif //RAYTRACER_TYPES_H

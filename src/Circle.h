@@ -18,6 +18,7 @@ public:
 private:
     Origin origin_;
     float radius_;
+    Material material_;
 };
 
 #endif //RAYTRACER_CIRCLE_H
