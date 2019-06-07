@@ -4,10 +4,8 @@
 #include "Ray.h"
 #include "Scene.h"
 #include <fmt/core.h>
-#include <memory>
 #include <numeric>
 #include <random>
-#include <vector>
 
 Vec3f randomUnitSphere()
 {
@@ -37,7 +35,7 @@ Vec3f colorOf(const Intersectable& intersectable, const Ray& ray)
     return (1.f - t) * Vec3f(1, 1, 1) + t * Vec3f(.5, .7, 1);
 }
 template <typename Intersectable>
-Vec3f antialiasedColorOf(int samples, int x, int width, int y, int height,
+Vec3f sampledColorOf(int samples, int x, int width, int y, int height,
     const Intersectable& intersectable, const Camera& camera)
 {
     Vec3f sampledColor(0, 0, 0);
@@ -62,22 +60,26 @@ Vec3f antialiasedColorOf(int samples, int x, int width, int y, int height,
 int main()
 {
     PNG png = PNG::make()
-                  .withSize(200, 100)
+                  .withSize(512, 256)
                   .withFillColor({ 255, 0, 0 });
 
-    Camera camera(Origin({ 0, 0, 0 }), Direction({ -2, -1, -1 }), Direction({ 4, 0, 0 }),
+    Camera camera(
+        Origin({ 0, 0, 0 }),
+        Direction({ -2, -1, -1 }),
+        Direction({ 4, 0, 0 }),
         Direction({ 0, 2, 0 }));
 
     Scene scene;
-    scene.add<Circle>(Origin({ 0, 0, -1 }), .5);
-    scene.add<Circle>(Origin({ .5, 100.5, -1 }), 100);
+    scene.add<Circle>(Origin({ -.25, 0, -1 }), .5);
+    scene.add<Circle>(Origin({ .25, 0, -1 }), .5);
+    scene.add<Circle>(Origin({ 0, 100.5, -1 }), 100);
 
 #pragma omp parallel for collapse(2)
     for (int y = 0; y < png.height(); ++y) {
         for (int x = 0; x < png.width(); ++x) {
             png.write(x, y,
                 RGBA::fromVec3f(
-                    antialiasedColorOf(100, x, png.width(), y, png.height(), scene, camera)));
+                    sampledColorOf(30, x, png.width(), y, png.height(), scene, camera)));
         }
     }
 
