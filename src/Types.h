@@ -52,8 +52,9 @@ public:
     {
     }
 
-    static constexpr RGBA fromVec3f(const Vec3f& vec) {
-        return RGBA{
+    static RGBA fromVec3f(const Vec3f& vec)
+    {
+        return RGBA {
             int(vec[0] * 255.f),
             int(vec[1] * 255.f),
             int(vec[2] * 255.f),
@@ -67,7 +68,7 @@ public:
 };
 
 struct Material {
-    RGBA diffuse{};
+    RGBA diffuse {};
 };
 
 struct Intersection {
