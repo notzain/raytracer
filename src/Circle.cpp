@@ -18,23 +18,19 @@ std::optional<Intersection> Circle::intersects(const Ray& ray, float min, float 
     const float discr = b * b - a * c;
 
     if (discr > 0) {
-        float d = distance(-b, discr, a, std::minus<>());
-        if (d < max && d > min) {
+        const auto makeIntersection = [&](float d) {
             const auto pointAlong = ray.pointAlong(d).value();
             return Intersection {
                 d,
                 pointAlong,
-                (pointAlong - origin().value()).normalized()
+                (pointAlong - origin().value()) / radius()
             };
-        }
-        d = distance(-b, discr, a, std::plus<>());
-        if (d < max && d > min) {
-            const auto pointAlong = ray.pointAlong(d).value();
-            return Intersection {
-                d,
-                pointAlong,
-                (pointAlong - origin().value()).normalized()
-            };
+        };
+
+        if (float d = distance(-b, discr, a, std::minus<>()); d < max && d > min) {
+            return makeIntersection(d);
+        } else if (d = distance(-b, discr, a, std::plus<>()); d < max && d > min) {
+            return makeIntersection(d);
         }
     }
 

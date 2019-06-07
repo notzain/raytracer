@@ -50,6 +50,7 @@ Vec3f sampledColorOf(int samples, int x, int width, int y, int height,
 
         sampledColor += colorOf(intersectable, camera.asRay(u, v));
     }
+
     sampledColor /= (float)samples;
 
     return sampledColor;
@@ -67,8 +68,7 @@ int main()
         float(png.width()) / png.height());
 
     Scene scene;
-    scene.add<Circle>(Origin({ -.25, 0, -1 }), .5);
-    scene.add<Circle>(Origin({ .25, 0, -1 }), .5);
+    scene.add<Circle>(Origin({ 0, 0, -1 }), .5);
     scene.add<Circle>(Origin({ 0, 100.5, -1 }), 100);
 
 #pragma omp parallel for collapse(2)

@@ -85,6 +85,4 @@ struct Intersectable : public IIntersectable {
     std::optional<Intersection> intersects(const class Ray& ray, float min, float max) const override { return static_cast<T const&>(*this).intersects(ray, min, max); }
 };
 
-
-
 #endif //RAYTRACER_TYPES_H
