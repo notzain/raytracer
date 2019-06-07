@@ -1,6 +1,6 @@
 #include "Scene.h"
 
-std::optional<Intersection> Scene::intersects(const struct Ray& ray, float min, float max) const
+std::optional<Intersection> Scene::intersects(const Ray& ray, float min, float max) const
 {
     std::optional<Intersection> intersection {};
     float nearestHit = max;

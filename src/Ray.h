@@ -6,7 +6,6 @@
 
 class Ray {
 public:
-    Ray() = default;
     Ray(Origin origin, Direction direction)
         : origin_(std::move(origin))
         , direction_(std::move(direction))

@@ -30,8 +30,9 @@ private:
     T value_;
 };
 
-using Origin = StrongType<Eigen::Vector3f, detail::OriginTag>;
-using Direction = StrongType<Eigen::Vector3f, detail::DirectionTag>;
+using Vec3f = Eigen::Vector3f;
+using Origin = StrongType<Vec3f, detail::OriginTag>;
+using Direction = StrongType<Vec3f, detail::DirectionTag>;
 
 class RGBA {
     std::array<int, 4> rgba { 0, 0, 0, 255 };
@@ -59,8 +60,8 @@ public:
 
 struct Intersection {
     float distance {};
-    Eigen::Vector3f position {};
-    Eigen::Vector3f normal {};
+    Vec3f position {};
+    Vec3f normal {};
 };
 
 struct IIntersectable {
