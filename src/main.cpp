@@ -48,9 +48,7 @@ Vec3f sampledColorOf(int samples, int x, int width, int y, int height,
         float u = float(x + realDistribution(rng)) / (float)width;
         float v = float(y + realDistribution(rng)) / (float)height;
 
-        Ray ray = camera.asRay(u, v);
-        const auto color = colorOf(intersectable, ray);
-        sampledColor += color;
+        sampledColor += colorOf(intersectable, camera.asRay(u, v));
     }
     sampledColor /= (float)samples;
 
@@ -65,9 +63,8 @@ int main()
 
     Camera camera(
         Origin({ 0, 0, 0 }),
-        Direction({ -2, -1, -1 }),
-        Direction({ 4, 0, 0 }),
-        Direction({ 0, 2, 0 }));
+        90,
+        float(png.width()) / png.height());
 
     Scene scene;
     scene.add<Circle>(Origin({ -.25, 0, -1 }), .5);

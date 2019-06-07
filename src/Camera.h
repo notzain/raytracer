@@ -4,33 +4,25 @@
 #include "Ray.h"
 #include "Types.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 class Camera {
 public:
-    Camera(Origin origin, Direction forward, Direction right, Direction up)
-        : origin_(std::move(origin))
-        , forward_(std::move(forward))
-        , right_(std::move(right))
-        , up_(std::move(up))
-    {
-    }
-    const Origin& origin() const { return origin_; }
-    const Direction& forward() const { return forward_; }
-    const Direction& right() const { return right_; }
-    const Direction& up() const { return up_; }
+    Camera(Origin origin, float fov, float aspectRatio);
 
-    Ray asRay(float u, float v) const
-    {
-        return {
-            origin(),
-            Direction(forward().value() + u * right().value() + v * up().value() - origin().value())
-        };
-    }
+    const Origin& origin() const { return origin_; }
+    const Vec3f& bottomLeft() const { return bottomLeft_; }
+    const Vec3f& right() const { return right_; }
+    const Vec3f& up() const { return up_; }
+
+    Ray asRay(float u, float v) const;
 
 private:
     Origin origin_;
-    Direction forward_;
-    Direction right_;
-    Direction up_;
+    Vec3f bottomLeft_;
+    Vec3f right_;
+    Vec3f up_;
 };
 
 #endif //RAYTRACER_CAMERA_H
