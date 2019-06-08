@@ -64,9 +64,11 @@ int main()
         float(png.width()) / png.height());
 
     Scene scene;
-    scene.add<Circle>(Origin({ 0, 0, -1 }), .5,
+    scene.add<Circle>(Origin({ -1, 0, -1 }), .25,
         Material { Vec3f(.8, .3, .3), &Lambertian });
-    scene.add<Circle>(Origin({ 1, 0, -1 }), .5,
+    scene.add<Circle>(Origin({ 1, 0, -1 }), .25,
+                      Material { Vec3f(.8, .3, .3), &Lambertian });
+    scene.add<Circle>(Origin({ 0, 0, -1 }), .5,
         Material { Vec3f(.8, .8, .8), &Metal });
     scene.add<Circle>(Origin({ 0, 100.5, -1 }), 100,
         Material { Vec3f(.8, .8, .0), &Lambertian });

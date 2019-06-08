@@ -35,8 +35,8 @@ std::optional<class Ray> Metal(const class Ray& ray, const Intersection& interse
     const auto reflected = reflect(ray.direction().value().normalized(), intersection.normal);
     const auto scattered = Ray(Origin(intersection.position), Direction(reflected));
     if (scattered.direction().value().dot(intersection.normal) > 0) {
-        return {};
+        return scattered;
     }
-    return scattered;
 
+    return {};
 }
