@@ -6,7 +6,7 @@
 template <typename Operation>
 float distance(float b, float discr, float a, Operation op)
 {
-    return op(b, std::sqrt(discr) / a);
+    return op(b, std::sqrt(discr)) / a;
 }
 
 std::optional<Hit> Circle::intersects(const Ray& ray, float min, float max) const
