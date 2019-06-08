@@ -1,7 +1,9 @@
 #ifndef RAYTRACER_RAY_H
 #define RAYTRACER_RAY_H
 
+#include "Materials.h"
 #include "Types.h"
+
 #include <Eigen/Dense>
 
 class Ray {
@@ -20,5 +22,6 @@ private:
     Origin origin_;
     Direction direction_;
 };
+
 
 #endif //RAYTRACER_RAY_H

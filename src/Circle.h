@@ -4,16 +4,17 @@
 
 class Circle : public Intersectable<Circle> {
 public:
-    Circle(Origin origin, float radius)
+    Circle(Origin origin, float radius, Material material)
         : origin_(std::move(origin))
         , radius_(radius)
+        , material_(std::move(material))
     {
     }
 
     constexpr const Origin& origin() const { return origin_; }
     constexpr float radius() const { return radius_; }
 
-    std::optional<Intersection> intersects(const class Ray& ray, float min, float max) const;
+    std::optional<Hit> intersects(const class Ray& ray, float min, float max) const;
 
 private:
     Origin origin_;

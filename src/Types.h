@@ -3,7 +3,9 @@
 
 #include <Eigen/Dense>
 #include <array>
+#include <functional>
 #include <optional>
+#include <utility>
 
 namespace detail {
 struct OriginTag;
@@ -67,23 +69,29 @@ public:
     constexpr const int& a() const { return rgba[3]; }
 };
 
-struct Material {
-    RGBA diffuse {};
-};
-
 struct Intersection {
     float distance {};
     Vec3f position {};
     Vec3f normal {};
 };
 
+struct Material {
+    Vec3f attenuation {};
+    std::optional<class Ray> (*scatter)(const class Ray& ray, const Intersection& intersection) {};
+};
+
+struct Hit {
+    Intersection intersection;
+    Material material;
+};
+
 struct IIntersectable {
-    virtual std::optional<Intersection> intersects(const class Ray& ray, float min, float max) const = 0;
+    virtual std::optional<Hit> intersects(const class Ray& ray, float min, float max) const = 0;
 };
 
 template <typename T>
 struct Intersectable : public IIntersectable {
-    std::optional<Intersection> intersects(const class Ray& ray, float min, float max) const override { return static_cast<T const&>(*this).intersects(ray, min, max); }
+    std::optional<Hit> intersects(const class Ray& ray, float min, float max) const override { return static_cast<T const&>(*this).intersects(ray, min, max); }
 };
 
 #endif //RAYTRACER_TYPES_H

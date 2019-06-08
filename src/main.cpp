@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "Circle.h"
+#include "Materials.h"
 #include "PNG.h"
 #include "Ray.h"
 #include "Scene.h"
@@ -7,27 +8,22 @@
 #include <numeric>
 #include <random>
 
-Vec3f randomUnitSphere()
-{
-    Vec3f p(0, 0, 0);
-    static std::uniform_real_distribution<float> realDistribution(.0f, 1.f);
-    static std::mt19937 rng(std::random_device {}());
-
-    do {
-        p = 2.f * Vec3f(realDistribution(rng), realDistribution(rng), realDistribution(rng))
-            - Vec3f(1, 1, 1);
-    } while (p.squaredNorm() >= 1.f);
-
-    return p;
-}
-
 template <typename Intersectable>
-Vec3f colorOf(const Intersectable& intersectable, const Ray& ray)
+Vec3f colorOf(const Intersectable& intersectable, const Ray& ray, int depth)
 {
-    if (const auto hit = intersectable.intersects(ray, .0001f, std::numeric_limits<float>::max())) {
-        const auto target = hit->position + hit->normal + randomUnitSphere();
-        const auto nextRay = Ray(Origin(hit->position), Direction(target - hit->position));
-        return .5 * colorOf(intersectable, nextRay);
+    if (auto hit = intersectable.intersects(ray, .0001f, std::numeric_limits<float>::max())) {
+        auto& intersection = hit->intersection;
+        auto& material = hit->material;
+        if (auto scatterRay = material.scatter(ray, intersection); scatterRay && depth < 50) {
+            const auto color = colorOf(intersectable, *scatterRay, depth + 1);
+            return Vec3f {
+                color[0] * material.attenuation[0],
+                color[1] * material.attenuation[1],
+                color[2] * material.attenuation[2],
+            };
+        } else {
+            return Vec3f { 0, 0, 0 };
+        }
     }
 
     const auto unitDirection = ray.direction().value().normalized();
@@ -48,7 +44,7 @@ Vec3f sampledColorOf(int samples, int x, int width, int y, int height,
         float u = float(x + realDistribution(rng)) / (float)width;
         float v = float(y + realDistribution(rng)) / (float)height;
 
-        sampledColor += colorOf(intersectable, camera.asRay(u, v));
+        sampledColor += colorOf(intersectable, camera.asRay(u, v), 0);
     }
 
     sampledColor /= (float)samples;
@@ -68,8 +64,12 @@ int main()
         float(png.width()) / png.height());
 
     Scene scene;
-    scene.add<Circle>(Origin({ 0, 0, -1 }), .5);
-    scene.add<Circle>(Origin({ 0, 100.5, -1 }), 100);
+    scene.add<Circle>(Origin({ 0, 0, -1 }), .5,
+        Material { Vec3f(.8, .3, .3), &Lambertian });
+    scene.add<Circle>(Origin({ 1, 0, -1 }), .5,
+        Material { Vec3f(.8, .8, .8), &Metal });
+    scene.add<Circle>(Origin({ 0, 100.5, -1 }), 100,
+        Material { Vec3f(.8, .8, .0), &Lambertian });
 
 #pragma omp parallel for collapse(2)
     for (int y = 0; y < png.height(); ++y) {

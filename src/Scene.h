@@ -8,7 +8,7 @@
 class Scene : public Intersectable<Scene> {
 public:
     Scene() = default;
-    std::optional<Intersection> intersects(const class Ray& ray, float min, float max) const;
+    std::optional<Hit> intersects(const class Ray& ray, float min, float max) const;
 
     template <typename T, typename... Args>
     T& add(Args&&... args)

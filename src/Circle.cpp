@@ -9,7 +9,7 @@ float distance(float b, float discr, float a, Operation op)
     return op(b, std::sqrt(discr) / a);
 }
 
-std::optional<Intersection> Circle::intersects(const Ray& ray, float min, float max) const
+std::optional<Hit> Circle::intersects(const Ray& ray, float min, float max) const
 {
     const auto oc = ray.origin().value() - origin().value();
     const float a = ray.direction().value().dot(ray.direction().value());
@@ -18,12 +18,13 @@ std::optional<Intersection> Circle::intersects(const Ray& ray, float min, float 
     const float discr = b * b - a * c;
 
     if (discr > 0) {
-        const auto makeIntersection = [&](float d) {
+        const auto makeIntersection = [&](float d) -> Hit {
             const auto pointAlong = ray.pointAlong(d).value();
-            return Intersection {
-                d,
-                pointAlong,
-                (pointAlong - origin().value()) / radius()
+            return {
+                Intersection { d,
+                    pointAlong,
+                    (pointAlong - origin().value()) / radius() },
+                material_
             };
         };
 
