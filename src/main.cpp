@@ -70,16 +70,21 @@ int main()
             &Lambertian,
             Vec3f(.8, .3, .3),
         });
-    scene.add<Sphere>(Origin({ 1, 0, -1 }), .25,
+    scene.add<Sphere>(Origin({ 1, -.25, -1 }), .25,
         Material {
             &Lambertian,
             Vec3f(.3, .3, .8),
         });
+    scene.add<Sphere>(Origin({ 1, .25, -1 }), .25,
+        Material {
+            &Dielectric,
+            Vec3f(1, 1, 1),
+            RefractIndex { 1.5 } });
     scene.add<Sphere>(Origin({ 0, 0, -1 }), .5,
         Material {
             &Metal,
             Vec3f(.9, .9, .9),
-            Fuzz { .01 } });
+            Fuzz { .3 } });
     scene.add<Sphere>(Origin({ 0, 100.5, -1 }), 100,
         Material {
             &Lambertian,
@@ -91,7 +96,7 @@ int main()
         for (int x = 0; x < png.width(); ++x) {
             png.write(x, y,
                 RGBA::fromVec3f(
-                    sampledColorOf(30, x, png.width(), y, png.height(), scene, camera)));
+                    sampledColorOf(100, x, png.width(), y, png.height(), scene, camera)));
         }
     }
 

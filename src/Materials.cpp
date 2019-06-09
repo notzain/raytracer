@@ -3,12 +3,12 @@
 #include <random>
 #include <variant>
 
+static std::uniform_real_distribution<float> realDistribution(.0f, 1.f);
+static std::mt19937 rng(std::random_device {}());
+
 Vec3f randomUnitSphere()
 {
     Vec3f p(0, 0, 0);
-    static std::uniform_real_distribution<float> realDistribution(.0f, 1.f);
-    static std::mt19937 rng(std::random_device {}());
-
     do {
         p = 2.f * Vec3f(realDistribution(rng), realDistribution(rng), realDistribution(rng))
             - Vec3f(1, 1, 1);
@@ -59,13 +59,52 @@ std::optional<Vec3f> refract(const Vec3f& v, const Vec3f& n, float nt)
     return {};
 }
 
+float schlick(float cos, float refract)
+{
+    float r = (1 - refract) / (1 + refract);
+    r *= r;
+    return r + (1 - r) * pow(1 - cos, 5);
+}
+
 std::optional<Ray> Dielectric(const class Ray& ray, const Intersection& intersection, const MaterialProperties& properties)
 {
     Vec3f out_normal(0, 0, 0);
     auto reflected = reflect(ray.direction().value(), intersection.normal);
+
+    const float refractIndex = [&properties]() -> float {
+        if (auto refract = std::get_if<RefractIndex>(&properties.variantProperties)) {
+            return refract->value();
+        }
+        return 1.f;
+    }();
+
+    float nt = 0;
+    float refProb = 1;
+    float cos = 0;
     if (ray.direction().value().dot(intersection.normal) > 0) {
         out_normal = -intersection.normal;
+        nt = refractIndex;
+        cos = refractIndex * ray.direction().value().dot(intersection.normal) / ray.direction().value().norm();
     } else {
+        out_normal = intersection.normal;
+        nt = 1.f / refractIndex;
+        cos = -ray.direction().value().dot(intersection.normal) / ray.direction().value().norm();
     }
-    return {};
+
+    auto refracted = refract(ray.direction().value(), out_normal, nt);
+    if (refracted) {
+        refProb = schlick(cos, refractIndex);
+    }
+
+    if (realDistribution(rng) < refProb) {
+        return Ray {
+            Origin(intersection.position),
+            Direction(reflected)
+        };
+    }
+
+    return Ray {
+        Origin(intersection.position),
+        Direction(*refracted)
+    };
 }

@@ -78,12 +78,14 @@ struct Intersection {
 
 namespace detail {
 struct FuzzTag;
+struct RefractTag;
 }
 
 using Fuzz = StrongType<float, detail::FuzzTag>;
+using RefractIndex = StrongType<float, detail::RefractTag>;
 struct MaterialProperties {
     Vec3f attenuation {};
-    std::variant<Fuzz> variantProperties {};
+    std::variant<Fuzz, RefractIndex> variantProperties {};
 };
 
 struct Material {
