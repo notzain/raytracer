@@ -1,9 +1,9 @@
 #include "Camera.h"
-#include "Circle.h"
 #include "Materials.h"
 #include "PNG.h"
 #include "Ray.h"
 #include "Scene.h"
+#include "Sphere.h"
 #include <fmt/core.h>
 #include <numeric>
 #include <random>
@@ -14,12 +14,13 @@ Vec3f colorOf(const Intersectable& intersectable, const Ray& ray, int depth)
     if (auto hit = intersectable.intersects(ray, .0001f, std::numeric_limits<float>::max())) {
         auto& intersection = hit->intersection;
         auto& material = hit->material;
-        if (auto scatterRay = material.scatter(ray, intersection); scatterRay && depth < 50) {
+        const auto& matColor = hit->material.props.attenuation;
+        if (auto scatterRay = material.scatter(ray, intersection, hit->material.props); scatterRay && depth < 50) {
             const auto color = colorOf(intersectable, *scatterRay, depth + 1);
             return Vec3f {
-                color[0] * material.attenuation[0],
-                color[1] * material.attenuation[1],
-                color[2] * material.attenuation[2],
+                color[0] * matColor[0],
+                color[1] * matColor[1],
+                color[2] * matColor[2],
             };
         } else {
             return Vec3f { 0, 0, 0 };
@@ -55,7 +56,7 @@ Vec3f sampledColorOf(int samples, int x, int width, int y, int height,
 int main()
 {
     PNG png = PNG::make()
-                  .withSize(512, 256)
+                  .withSize(1024, 512)
                   .withFillColor({ 255, 0, 0 });
 
     Camera camera(
@@ -64,14 +65,26 @@ int main()
         float(png.width()) / png.height());
 
     Scene scene;
-    scene.add<Circle>(Origin({ -1, 0, -1 }), .25,
-        Material { Vec3f(.8, .3, .3), &Lambertian });
-    scene.add<Circle>(Origin({ 1, 0, -1 }), .25,
-                      Material { Vec3f(.8, .3, .3), &Lambertian });
-    scene.add<Circle>(Origin({ 0, 0, -1 }), .5,
-        Material { Vec3f(.8, .8, .8), &Metal });
-    scene.add<Circle>(Origin({ 0, 100.5, -1 }), 100,
-        Material { Vec3f(.8, .8, .0), &Lambertian });
+    scene.add<Sphere>(Origin({ -1, 0, -1 }), .25,
+        Material {
+            &Lambertian,
+            Vec3f(.8, .3, .3),
+        });
+    scene.add<Sphere>(Origin({ 1, 0, -1 }), .25,
+        Material {
+            &Lambertian,
+            Vec3f(.3, .3, .8),
+        });
+    scene.add<Sphere>(Origin({ 0, 0, -1 }), .5,
+        Material {
+            &Metal,
+            Vec3f(.9, .9, .9),
+            Fuzz { .01 } });
+    scene.add<Sphere>(Origin({ 0, 100.5, -1 }), 100,
+        Material {
+            &Lambertian,
+            Vec3f(.8, .8, .0),
+        });
 
 #pragma omp parallel for collapse(2)
     for (int y = 0; y < png.height(); ++y) {

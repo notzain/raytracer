@@ -6,6 +6,7 @@
 #include <functional>
 #include <optional>
 #include <utility>
+#include <variant>
 
 namespace detail {
 struct OriginTag;
@@ -75,9 +76,19 @@ struct Intersection {
     Vec3f normal {};
 };
 
-struct Material {
+namespace detail {
+struct FuzzTag;
+}
+
+using Fuzz = StrongType<float, detail::FuzzTag>;
+struct MaterialProperties {
     Vec3f attenuation {};
-    std::optional<class Ray> (*scatter)(const class Ray& ray, const Intersection& intersection) {};
+    std::variant<Fuzz> variantProperties {};
+};
+
+struct Material {
+    std::optional<class Ray> (*scatter)(const class Ray& ray, const Intersection& intersection, const MaterialProperties& properties) {};
+    MaterialProperties props {};
 };
 
 struct Hit {

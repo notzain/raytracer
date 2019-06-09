@@ -1,10 +1,10 @@
-#ifndef RAYTRACER_CIRCLE_H
-#define RAYTRACER_CIRCLE_H
+#ifndef RAYTRACER_SPHERE_H
+#define RAYTRACER_SPHERE_H
 #include "Types.h"
 
-class Circle : public Intersectable<Circle> {
+class Sphere : public Intersectable<Sphere> {
 public:
-    Circle(Origin origin, float radius, Material material)
+    Sphere(Origin origin, float radius, Material material)
         : origin_(std::move(origin))
         , radius_(radius)
         , material_(std::move(material))
@@ -22,4 +22,4 @@ private:
     Material material_;
 };
 
-#endif //RAYTRACER_CIRCLE_H
+#endif //RAYTRACER_SPHERE_H

@@ -1,4 +1,4 @@
-#include "Circle.h"
+#include "Sphere.h"
 #include "Ray.h"
 #include <cmath>
 #include <functional>
@@ -9,7 +9,7 @@ float distance(float b, float discr, float a, Operation op)
     return op(b, std::sqrt(discr)) / a;
 }
 
-std::optional<Hit> Circle::intersects(const Ray& ray, float min, float max) const
+std::optional<Hit> Sphere::intersects(const Ray& ray, float min, float max) const
 {
     const auto oc = ray.origin().value() - origin().value();
     const float a = ray.direction().value().dot(ray.direction().value());
