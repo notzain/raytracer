@@ -1,5 +1,8 @@
 #include "Camera.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 Camera::Camera(Origin origin, float fov, float aspectRatio)
     : origin_(std::move(origin))
 {
@@ -16,8 +19,8 @@ Ray Camera::asRay(float u, float v) const
     return {
         origin(),
         Direction(bottomLeft()
-                  + (u * right())
-                  + (v * up())
-                  - origin().value())
+            + (u * right())
+            + (v * up())
+            - origin().value())
     };
 }

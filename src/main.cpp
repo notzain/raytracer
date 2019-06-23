@@ -14,8 +14,8 @@ Vec3f colorOf(const Intersectable& intersectable, const Ray& ray, int depth)
     if (auto hit = intersectable.intersects(ray, .0001f, std::numeric_limits<float>::max())) {
         auto& intersection = hit->intersection;
         auto& material = hit->material;
-        const auto& matColor = hit->material.props.attenuation;
-        if (auto scatterRay = material.scatter(ray, intersection, hit->material.props); scatterRay && depth < 50) {
+        const auto matColor = material.attenuation();
+        if (auto scatterRay = scatter(ray, intersection, material); scatterRay && depth < 50) {
             const auto color = colorOf(intersectable, *scatterRay, depth + 1);
             return Vec3f {
                 color[0] * matColor[0],
@@ -66,30 +66,19 @@ int main()
 
     Scene scene;
     scene.add<Sphere>(Origin({ -1, 0, -1 }), .25,
-        Material {
-            &Lambertian,
-            Vec3f(.8, .3, .3),
-        });
+        Material { Material::Lambertian {
+            Vec3f(.8, .3, .3) } });
     scene.add<Sphere>(Origin({ 1, -.25, -1 }), .25,
-        Material {
-            &Lambertian,
-            Vec3f(.3, .3, .8),
-        });
+        Material { Material::Lambertian {
+            Vec3f(.3, .3, .8) } });
     scene.add<Sphere>(Origin({ 1, .25, -1 }), .25,
-        Material {
-            &Dielectric,
-            Vec3f(1, 1, 1),
-            RefractIndex { 1.5 } });
+        Material { Material::Dielectric { 1.5f } });
     scene.add<Sphere>(Origin({ 0, 0, -1 }), .5,
-        Material {
-            &Metal,
-            Vec3f(.9, .9, .9),
-            Fuzz { .3 } });
+        Material { Material::Metal {
+            Vec3f(.9, .9, .9), .3f } });
     scene.add<Sphere>(Origin({ 0, 100.5, -1 }), 100,
-        Material {
-            &Lambertian,
-            Vec3f(.8, .8, .0),
-        });
+        Material { Material::Lambertian {
+            Vec3f(.8, .8, .0) } });
 
 #pragma omp parallel for collapse(2)
     for (int y = 0; y < png.height(); ++y) {

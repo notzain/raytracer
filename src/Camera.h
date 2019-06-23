@@ -4,9 +4,6 @@
 #include "Ray.h"
 #include "Types.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 class Camera {
 public:
     Camera(Origin origin, float fov, float aspectRatio);

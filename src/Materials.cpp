@@ -17,7 +17,7 @@ Vec3f randomUnitSphere()
     return p;
 }
 
-std::optional<Ray> Lambertian(const Ray& ray, const Intersection& hit, const MaterialProperties& properties)
+std::optional<Ray> Lambertian(const Ray& ray, const Intersection& hit, const Material::Lambertian& properties)
 {
     const auto target = hit.position + hit.normal + randomUnitSphere();
     return Ray {
@@ -31,14 +31,9 @@ Vec3f reflect(const Vec3f& v, const Vec3f& n)
     return v - 2 * v.dot(n) * n;
 }
 
-std::optional<Ray> Metal(const class Ray& ray, const Intersection& intersection, const MaterialProperties& properties)
+std::optional<Ray> Metal(const class Ray& ray, const Intersection& intersection, const Material::Metal& properties)
 {
-    const float fuzz = [&properties]() -> float {
-        if (auto fuzz = std::get_if<Fuzz>(&properties.variantProperties)) {
-            return fuzz->value();
-        }
-        return 1.f;
-    }();
+    const float fuzz = properties.fuzz;
     const auto reflected = reflect(ray.direction().value().normalized(), intersection.normal);
     const auto scattered = Ray(Origin(intersection.position), Direction(reflected + fuzz * randomUnitSphere()));
     if (scattered.direction().value().dot(intersection.normal) > 0) {
@@ -66,17 +61,12 @@ float schlick(float cos, float refract)
     return r + (1 - r) * pow(1 - cos, 5);
 }
 
-std::optional<Ray> Dielectric(const class Ray& ray, const Intersection& intersection, const MaterialProperties& properties)
+std::optional<Ray> Dielectric(const class Ray& ray, const Intersection& intersection, const Material::Dielectric& properties)
 {
     Vec3f out_normal(0, 0, 0);
     auto reflected = reflect(ray.direction().value(), intersection.normal);
 
-    const float refractIndex = [&properties]() -> float {
-        if (auto refract = std::get_if<RefractIndex>(&properties.variantProperties)) {
-            return refract->value();
-        }
-        return 1.f;
-    }();
+    const float refractIndex = properties.refractIndex;
 
     float nt = 0;
     float refProb = 1;
@@ -107,4 +97,21 @@ std::optional<Ray> Dielectric(const class Ray& ray, const Intersection& intersec
         Origin(intersection.position),
         Direction(*refracted)
     };
+}
+
+template <class... Ts>
+struct overloaded : Ts... {
+    using Ts::operator()...;
+};
+template <class... Ts>
+overloaded(Ts...)->overloaded<Ts...>;
+
+std::optional<class Ray> scatter(const Ray& ray, const Intersection& intersection, const Material& material)
+{
+    return std::visit(overloaded {
+                          [&](const Material::Lambertian& mat) { return Lambertian(ray, intersection, mat); },
+                          [&](const Material::Metal& mat) { return Metal(ray, intersection, mat); },
+                          [&](const Material::Dielectric& mat) { return Dielectric(ray, intersection, mat); },
+                      },
+        material.materialType);
 }

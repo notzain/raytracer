@@ -76,21 +76,29 @@ struct Intersection {
     Vec3f normal {};
 };
 
-namespace detail {
-struct FuzzTag;
-struct RefractTag;
-}
-
-using Fuzz = StrongType<float, detail::FuzzTag>;
-using RefractIndex = StrongType<float, detail::RefractTag>;
-struct MaterialProperties {
-    Vec3f attenuation {};
-    std::variant<Fuzz, RefractIndex> variantProperties {};
-};
-
 struct Material {
-    std::optional<class Ray> (*scatter)(const class Ray& ray, const Intersection& intersection, const MaterialProperties& properties) {};
-    MaterialProperties props {};
+    struct Lambertian {
+        Vec3f attenuation {};
+    };
+
+    struct Metal {
+        Vec3f attenuation {};
+        float fuzz {};
+    };
+
+    struct Dielectric {
+        float refractIndex {};
+        Vec3f attenuation { 1, 1, 1 };
+    };
+
+    std::variant<Lambertian, Metal, Dielectric> materialType;
+    Vec3f attenuation() const
+    {
+        return std::visit([](auto&& material) {
+            return material.attenuation;
+        },
+            materialType);
+    }
 };
 
 struct Hit {
